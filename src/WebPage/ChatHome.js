@@ -15,10 +15,11 @@ import { firestore as db } from "../firebase";
 import { auth } from "../firebase";
 
 import {
-    addDoc,
     collection,
     onSnapshot,
     doc,
+    addDoc,
+    getDocs,
     getDoc
 } from "firebase/firestore";
 
@@ -76,8 +77,6 @@ const UsersComponent = (props) => {
     );
 };
 
-
-
 export default function Home() {
     const [users, setUsers] = useState([]);
     const [receiverData, setReceiverData] = useState(null);
@@ -108,19 +107,33 @@ export default function Home() {
     useEffect(() => {
         const fetchClientInfo = async () => {
             if (receiverData && receiverData.type === "client") {
-                const clientDoc = await getDoc(doc(db, "clients", receiverData.userId));
-                if (clientDoc.exists()) {
-                    setClientName(clientDoc.data().name);
-                    setContactInfo(clientDoc.data().contact);
+                const clientDocRef = doc(db, "clients", receiverData.userId);
+                const clientDocSnapshot = await getDoc(clientDocRef);
+    
+                if (clientDocSnapshot.exists()) {
+                    const clientData = clientDocSnapshot.data();
+                    setClientName(clientData.name);
+                    setContactInfo(clientData.contact);
+    
+                    // Fetch the messages collection under the client document
+                    const messagesCollectionRef = collection(clientDocRef, "messages");
+                    const messagesQuerySnapshot = await getDocs(messagesCollectionRef);
+                    const messages = messagesQuerySnapshot.docs.map((doc) => doc.data());
+    
+                    // Set the messages state with the fetched messages
+                    setAllMessages(messages);
                 }
             } else {
                 setClientName(""); // Reset client name if not available or receiverData type is not client
                 setContactInfo(""); // Reset contact info if not available or receiverData type is not client
+                setAllMessages([]); // Reset messages if receiverData type is not client
             }
         };
-
+    
         fetchClientInfo();
     }, [receiverData]);
+    
+    
 
     const handleToggle = (username, userId, type, concern) => {
         setReceiverData({
@@ -175,6 +188,36 @@ export default function Home() {
         </div>
       );
 
+      useEffect(() => {
+        const fetchAllMessages = async () => {
+            try {
+                // Verify if receiverData is updated correctly
+                console.log(receiverData);
+    
+                if (receiverData && receiverData.type === "client") {
+                    // Verify if the correct user ID is being used
+                    console.log(receiverData.userId);
+    
+                    const clientRef = doc(db, "clients", receiverData.userId);
+    
+                    // Verify if the clientRef is correct
+                    console.log(clientRef.path);
+    
+                    const messagesSnapshot = await clientRef.collection("messages").get();
+                    const messages = messagesSnapshot.docs.map((doc) => doc.data());
+                    setAllMessages(messages);
+                } else {
+                    // Reset allMessages if no client is clicked or receiverData type is not client
+                    setAllMessages([]);
+                }
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+            }
+        };
+    
+        fetchAllMessages();
+    }, [receiverData]);
+    
     return (
         <div style={root}>
             <Paper style={left}>
@@ -223,33 +266,7 @@ export default function Home() {
                 
                 <div style={messagesDiv}>
                     
-                    {allMessages.map(({ id, messageUserId, username, message }) => (
-                        <div
-                            key={id}
-                            style={{
-                                margin: 2,
-                                display: "flex",
-                                flexDirection: user?.uid === messageUserId ? "row-reverse" : "row",
-                            }}
-                        >
-                            <span
-                                style={{
-                                    backgroundColor: "#BB8FCE",
-                                    padding: 6,
-                                    borderTopLeftRadius: user?.uid === messageUserId ? 10 : 0,
-                                    borderTopRightRadius: user?.uid === messageUserId ? 0 : 10,
-                                    borderBottomLeftRadius: 10,
-                                    borderBottomRightRadius: 10,
-                                    maxWidth: 400,
-                                    fontSize: 15,
-                                    textAlign: user?.uid === messageUserId ? "right" : "left",
-                                }}
-                            >                          
-                                {message}
-                            </span>
-                        </div>
-                    ))}
-                    {concern && (
+                {concern && (
                         <div
                             key="concern"
                             style={{
@@ -275,6 +292,34 @@ export default function Home() {
                             </span>
                         </div>
                     )}
+                    
+                    {allMessages.map(({ id, messageUserId, username, message }) => (
+                        
+                        <div
+                            key={id}
+                            style={{
+                                margin: 2,
+                                display: "flex",
+                                flexDirection: user?.uid === messageUserId ? "row-reverse" : "row",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    backgroundColor: "#BB8FCE",
+                                    padding: 6,
+                                    borderTopLeftRadius: user?.uid === messageUserId ? 10 : 0,
+                                    borderTopRightRadius: user?.uid === messageUserId ? 0 : 10,
+                                    borderBottomLeftRadius: 10,
+                                    borderBottomRightRadius: 10,
+                                    maxWidth: 400,
+                                    fontSize: 15,
+                                    textAlign: user?.uid === messageUserId ? "right" : "left",
+                                }}
+                            >                          
+                                {message}
+                            </span>
+                        </div>
+                    ))}
                 </div>
                 <div style={{ width: "100%", display: "flex", flex: 0.08 }}>
                     <input
