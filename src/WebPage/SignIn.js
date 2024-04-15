@@ -28,8 +28,7 @@ export default function SignIn() {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                navigate("/chat-home/1");
-                // ...
+                navigate("/chat-home/1"); //navigate route
             })
             .catch((error) => {
                 const errorMessage = error.message;

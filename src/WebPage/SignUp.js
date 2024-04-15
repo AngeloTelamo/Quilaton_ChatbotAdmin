@@ -34,9 +34,6 @@ export default function SignUp() {
                 email,
                 password
             );
-            // const update = await updateProfile(auth.currentUser, {
-            //     displayName: username,
-            // });
 
             const user = userCredential.user;
 

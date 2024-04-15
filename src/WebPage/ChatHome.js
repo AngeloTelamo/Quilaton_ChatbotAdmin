@@ -23,18 +23,19 @@ import {
     getDoc
 } from "firebase/firestore";
 
-const UsersComponent = (props) => {
-    const handleToggle = (username, userId, type, concern) => {
+const UsersComponent = (props) => { 
+    const handleToggle = (username, userId, type, concern) => { //Handle clicks to initiate a chat session
         props.handleToggle(username, userId, type, concern);
         props.setReceiverData({
             username: username,
             userId: userId,
             type: type,
         });
-        props.navigate(`/chat-home/${userId}`);
+        props.navigate(`/chat-home/${userId}`); //render the client UID 
     };
 
     return (
+        //list of users depends on whats store in firebase client collection
         <List
             dense
             sx={{
@@ -77,19 +78,21 @@ const UsersComponent = (props) => {
     );
 };
 
-export default function Home() {
-    const [users, setUsers] = useState([]);
-    const [receiverData, setReceiverData] = useState(null);
-    const [chatMessage, setChatMessage] = useState("");
-    const [allMessages, setAllMessages] = useState([]);
-    const [concern, setConcern] = useState("");
-    const [clientName, setClientName] = useState("");
+export default function Home() { //main component the chat room 
+    const [users, setUsers] = useState([]);// State to hold client's contact information
+    const [receiverData, setReceiverData] = useState(null); // State to hold client's contact information
+    const [chatMessage, setChatMessage] = useState("");// State to hold client's contact information
+    const [allMessages, setAllMessages] = useState([]);// State to hold client's contact information
+    const [concern, setConcern] = useState("");// State to hold client's contact information
+    const [clientName, setClientName] = useState("");// State to hold client's contact information
+    const [createdTime, setCreatedTime] = useState(""); // State to hold client's contact information
     const [contactInfo, setContactInfo] = useState(""); // State to hold client's contact information
 
     const user = auth.currentUser;
     const navigate = useNavigate();
 
-    useEffect(() => {
+
+    useEffect(() => { //fetch method from firebase 
         const unsub1 = onSnapshot(collection(db, "admin_users"), (snapshot) => {
             setUsers(snapshot.docs.map((doc) => ({ ...doc.data(), type: "admin", userId: doc.id })));
         });
@@ -104,70 +107,82 @@ export default function Home() {
         };
     }, []);
 
+    // Fetch client information and messages when receiverData changes
     useEffect(() => {
         const fetchClientInfo = async () => {
-            if (receiverData && receiverData.type === "client") {
-                const clientDocRef = doc(db, "clients", receiverData.userId);
-                const clientDocSnapshot = await getDoc(clientDocRef);
+            if (receiverData && receiverData.type === "client") { // Check if receiverData exists and its is "client" collection
+                const clientDocRef = doc(db, "clients", receiverData.userId); //get the document based uid
+                const clientDocSnapshot = await getDoc(clientDocRef); //get document function
     
-                if (clientDocSnapshot.exists()) {
-                    const clientData = clientDocSnapshot.data();
+                if (clientDocSnapshot.exists()) { //check if the document exists 
+                    const clientData = clientDocSnapshot.data(); //if exisxt, extract the document data field
                     setClientName(clientData.name);
                     setContactInfo(clientData.contact);
     
-                    // Fetch the messages collection under the client document
-                    const messagesCollectionRef = collection(clientDocRef, "messages");
-                    const messagesQuerySnapshot = await getDocs(messagesCollectionRef);
-                    const messages = messagesQuerySnapshot.docs.map((doc) => doc.data());
-    
-                    // Set the messages state with the fetched messages
-                    setAllMessages(messages);
+                    const createdTime = clientData.createdTime.toDate(); //convert firestore timestamp
+                    const formattedCreatedTime = createdTime.toLocaleString();//make readable string date 
+                    setConcern(clientData.concern);
+                    setCreatedTime(formattedCreatedTime);
                 }
+    
+                const messagesCollectionRef = collection(clientDocRef, "messages"); //subcollection of client called messages
+                const messagesQuerySnapshot = await getDocs(messagesCollectionRef); //fetch all document in subcollection
+                const messages = messagesQuerySnapshot.docs.map((doc) => doc.data()); //render the data using map 
+    
+                setAllMessages(messages); //all messages
             } else {
-                setClientName(""); // Reset client name if not available or receiverData type is not client
-                setContactInfo(""); // Reset contact info if not available or receiverData type is not client
-                setAllMessages([]); // Reset messages if receiverData type is not client
+                //set to null if the user doesnt exist in client collections
+                setClientName("");
+                setContactInfo("");
+                setAllMessages([]);
             }
         };
     
         fetchClientInfo();
     }, [receiverData]);
     
-    
 
     const handleToggle = (username, userId, type, concern) => {
+        // Set the concern state with the provided concern
         setReceiverData({
             username: username,
             userId: userId,
             type: type,
         });
+        // Set the concern state with the provided concern
         setConcern(concern);
     };
 
     const sendMessage = async () => {
         try {
             if (user && receiverData) {
-                const messageData = {
+                //check if the users/admin is authenticated and the receiverData is available
+                const messageData = { 
+                    //create docuemtn field for admin to write a replyMessages to client collection
                     username: user.displayName,
                     messageUserId: user.uid,
                     message: chatMessage,
                     timestamp: new Date(),
                 };
                 
-                const messageCollection = receiverData.type === "admin" ? "admin_users" : "clients";
+                const messageCollection = receiverData.type === "admin" ? "admin_users" : "clients"; // Determine the collection to store the message based on the receiver's type
                 
                 await addDoc(
+                    // Add the reply message to the Firestore collection under the clients collection
                     collection(db, messageCollection, receiverData.userId, "messages"),
                     messageData
                 );
-                
+                 // Update the list of messages displayed on the UI including the reply messages and messages from client 
                 setAllMessages((prevMessages) => [...prevMessages, messageData]);
             } else {
+                 // Log an error if user authentication or receiverData is not available
                 console.error("User is not authenticated, display name is not set, or receiver data is not available.");
             }
         } catch (error) {
+             // Log an an error the messages experiencing an issues
             console.error("Error sending message:", error);
         }
+         // Clear the chat message input field after sending the message
         setChatMessage("");
     };
 
@@ -189,22 +204,24 @@ export default function Home() {
       );
 
       useEffect(() => {
+        //fetch all messages associated with client
         const fetchAllMessages = async () => {
             try {
-                // Verify if receiverData is updated correctly
-                console.log(receiverData);
-    
-                if (receiverData && receiverData.type === "client") {
-                    // Verify if the correct user ID is being used
-                    console.log(receiverData.userId);
-    
+                if (receiverData && receiverData.type === "client") { // Get a reference to the client document in the Firestore database
                     const clientRef = doc(db, "clients", receiverData.userId);
-    
-                    // Verify if the clientRef is correct
-                    console.log(clientRef.path);
-    
-                    const messagesSnapshot = await clientRef.collection("messages").get();
-                    const messages = messagesSnapshot.docs.map((doc) => doc.data());
+                    const messagesCollectionRef = collection(clientRef, "messages");
+                    
+                    // Retrieve all documents from the "messages" subcollection
+                    const messagesQuerySnapshot = await getDocs(messagesCollectionRef);
+                    const messages = messagesQuerySnapshot.docs.map((doc) => {
+                        const messageData = doc.data();
+                        // Convert Firestore Timestamp to JavaScript Date object
+                        const timestamp = messageData.timestamp.toDate();
+                        // Add timestamp to the message data
+                        return { ...messageData, timestamp };
+                    });
+
+                     // Update the state variable to store all messages
                     setAllMessages(messages);
                 } else {
                     // Reset allMessages if no client is clicked or receiverData type is not client
@@ -214,11 +231,13 @@ export default function Home() {
                 console.error("Error fetching messages:", error);
             }
         };
-    
+        // Call the fetchAllMessages function when the receiverData changes
         fetchAllMessages();
     }, [receiverData]);
     
+    
     return (
+        //main container for the initerface
         <div style={root}>
             <Paper style={left}>
                 <div
@@ -230,9 +249,11 @@ export default function Home() {
                 >
                     
                   <AvatarProfile />
+                    {/* Chatroom title */}
                     <h5>Quilaton Office Chatroom</h5>
 
                     <Button
+                    // Function to sign out user and navigate to home page
                         color="secondary"
                         onClick={() => {
                             auth.signOut();
@@ -245,7 +266,7 @@ export default function Home() {
                 <Divider />
                 
                 All Chat from Clients
-
+                 {/* Scrollable area for displaying users */}
                 <div style={{ overflowY: "scroll" }}>
                     <UsersComponent
                         users={users}
@@ -258,6 +279,7 @@ export default function Home() {
             </Paper>
 
             <Paper style={right}>
+                 {/* Client details section */}
                 <div>
                     <h4>{clientName}</h4>
                     <p>Contact: {contactInfo}</p>
@@ -265,7 +287,7 @@ export default function Home() {
                 </div>
                 
                 <div style={messagesDiv}>
-                    
+                    {/* Display concern if available */}
                 {concern && (
                         <div
                             key="concern"
@@ -289,14 +311,24 @@ export default function Home() {
                                 }}
                             >                          
                                 {concern}
-                            </span>
-                        </div>
+                            </span>        
+                            </div>
                     )}
-                    
-                    {allMessages.map(({ id, messageUserId, username, message }) => (
-                        
-                        <div
-                            key={id}
+                    {/* Display concern if available */}
+                        <span
+                            style={{
+                                fontSize: 12,
+                                color: "#666",
+                                marginTop: 2, 
+                                textAlign: "left",
+                            }}
+                        >
+                            {createdTime}
+                        </span>
+                       
+                     {/* Display messages reply with the client */}
+                    {allMessages.map(({ id, messageUserId, username, message, timestamp }) => (
+                       <div
                             style={{
                                 margin: 2,
                                 display: "flex",
@@ -317,6 +349,18 @@ export default function Home() {
                                 }}
                             >                          
                                 {message}
+                               
+                            </span>
+                            <span
+                                style={{
+                                    fontSize: 12,
+                                    color: "#666",
+                                    marginTop: 2, 
+                                    textAlign: 'right',
+                                }}
+                            >
+                                 {/* Display timestamp of the message */}
+                                {new Date(timestamp.seconds * 1000).toLocaleString()}
                             </span>
                         </div>
                     ))}
