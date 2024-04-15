@@ -7,6 +7,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import Profile from './Profile.jpg';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { auth, firestore as db } from "../firebase";
 
@@ -54,7 +55,7 @@ export default function SignUp() {
         <ThemeProvider theme={theme}>
             <Box
                 sx={{
-                    backgroundColor: "#B4B4B8", // Set background color to grey
+                    background: "linear-gradient(to bottom, #3b3b4a, #9998b3)", // Set linear gradient background color from top to bottom
                     minHeight: "100vh", // Set minimum height to full viewport height
                     display: "flex",
                     justifyContent: "center",
@@ -62,9 +63,11 @@ export default function SignUp() {
                 }}
             >
                 <Container component="main" maxWidth="xs">
+
                     <CssBaseline />
                     <Box
                         sx={{
+                            background:"#3b3b4a" ,
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
@@ -74,9 +77,18 @@ export default function SignUp() {
                             color: "white",
                         }}
                     >
-
+                         <img 
+                                src={Profile} 
+                                alt="Profile" 
+                                style={{ 
+                                    width: "150px", 
+                                    height: "150px", 
+                                    borderRadius: "50%", 
+                                    marginBottom: "20px" 
+                                }} 
+                            />
                         <Typography component="h1" variant="h5">
-                            Sign up
+                            Register
                         </Typography>
 
                         <Box
@@ -92,7 +104,7 @@ export default function SignUp() {
                                 required
                                 fullWidth
                                 id="firstName"
-                                label="First Name"
+                                label="Full Name"
                                 autoFocus
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}

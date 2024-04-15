@@ -150,8 +150,8 @@ export default function Home() { //main component the chat room
             type: type,
         });
         // Set the concern state with the provided concern
-        setConcern(concern);
-    };
+            setConcern(concern);
+        };
 
     const sendMessage = async () => {
         try {
@@ -279,8 +279,8 @@ export default function Home() { //main component the chat room
             </Paper>
 
             <Paper style={right}>
-                 {/* Client details section */}
-                <div>
+                
+                <div style={{ textAlign: "center" }}>
                     <h4>{clientName}</h4>
                     <p>Contact: {contactInfo}</p>
                     <Divider />
