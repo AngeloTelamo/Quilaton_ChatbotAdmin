@@ -238,7 +238,7 @@ export default function Home() { //main component the chat room
     
     return (
         //main container for the initerface
-        <div style={root}>
+        <div style={root} >
             <Paper style={left}>
                 <div
                     style={{
@@ -249,8 +249,7 @@ export default function Home() { //main component the chat room
                 >
                     
                   <AvatarProfile />
-                    {/* Chatroom title */}
-                    <h5>Quilaton Office Chatroom</h5>
+                    <h5 style={{ textAlign: "center" }}>Quilaton Office Chatroom</h5>
 
                     <Button
                     // Function to sign out user and navigate to home page
@@ -264,8 +263,11 @@ export default function Home() { //main component the chat room
                     </Button>
                 </div>
                 <Divider />
-                
-                All Chat from Clients
+
+                <div style={{ textAlign: "center", fontWeight: "bold" }}>
+                    All Chat from Clients
+                </div>
+
                  {/* Scrollable area for displaying users */}
                 <div style={{ overflowY: "scroll" }}>
                     <UsersComponent
@@ -280,12 +282,11 @@ export default function Home() { //main component the chat room
 
             <Paper style={right}>
                 
-                <div style={{ textAlign: "center" }}>
+                <div style={{ textAlign: "center", fontWeight: "bold"}}>
                     <h4>{clientName}</h4>
-                    <p>Contact: {contactInfo}</p>
-                    <Divider />
+                    <p>Contact information: {contactInfo}</p>
                 </div>
-                
+             
                 <div style={messagesDiv}>
                     {/* Display concern if available */}
                 {concern && (
@@ -384,6 +385,7 @@ export default function Home() { //main component the chat room
 
 
 const root = {
+    background: "linear-gradient(to bottom, #3b3b4a, #9998b3)",
     display: "flex",
     flexDirection: "row",
     flex: 1,
