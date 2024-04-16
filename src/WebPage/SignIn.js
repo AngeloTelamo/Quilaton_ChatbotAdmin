@@ -72,7 +72,7 @@ export default function SignIn() {
                             />
 
                         <Typography component="h1" variant="h5" textAlign="center">
-                        Welcome to Quilaton Office Admin
+                        Welcome to Quilaton Office Administrator
                         </Typography>
                         
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>

@@ -87,10 +87,9 @@ export default function SignUp() {
                                     marginBottom: "20px" 
                                 }} 
                             />
-                        <Typography component="h1" variant="h5">
-                            Register
+                        <Typography component="h1" variant="h5" textAlign="center">
+                        Welcome to Quilaton Office Registration
                         </Typography>
-
                         <Box
                             component="form"
                             onSubmit={handleSubmit}
