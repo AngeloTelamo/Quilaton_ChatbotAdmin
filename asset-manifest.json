@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/Quilaton_ChatbotAdmin/static/css/main.5a57a607.css",
-    "main.js": "/Quilaton_ChatbotAdmin/static/js/main.f8941091.js",
+    "main.js": "/Quilaton_ChatbotAdmin/static/js/main.51915801.js",
     "static/js/453.6b59c72a.chunk.js": "/Quilaton_ChatbotAdmin/static/js/453.6b59c72a.chunk.js",
     "static/media/Profile.jpg": "/Quilaton_ChatbotAdmin/static/media/Profile.da724208f3617fafec6e.jpg",
     "index.html": "/Quilaton_ChatbotAdmin/index.html",
     "main.5a57a607.css.map": "/Quilaton_ChatbotAdmin/static/css/main.5a57a607.css.map",
-    "main.f8941091.js.map": "/Quilaton_ChatbotAdmin/static/js/main.f8941091.js.map",
+    "main.51915801.js.map": "/Quilaton_ChatbotAdmin/static/js/main.51915801.js.map",
     "453.6b59c72a.chunk.js.map": "/Quilaton_ChatbotAdmin/static/js/453.6b59c72a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5a57a607.css",
-    "static/js/main.f8941091.js"
+    "static/js/main.51915801.js"
   ]
 }
