@@ -125,7 +125,7 @@ export default function SignIn() {
                             </Button>
                             <Grid container justifyContent="flex-end">
                                 <Grid item>
-                                    <Link href="/Signup" variant="body2" sx={{ color: "white" }}>
+                                    <Link href="/Quilaton_ChatbotAdmin/signup" variant="body2" sx={{ color: "white" }}>
                                         {"Don't have an account? Sign Up"}
                                     </Link>
                                 </Grid>
