@@ -87,6 +87,7 @@ export default function Home() { //main component the chat room
     const [clientName, setClientName] = useState("");// State to hold client's contact information
     const [createdTime, setCreatedTime] = useState(""); // State to hold client's contact information
     const [contactInfo, setContactInfo] = useState(""); // State to hold client's contact information
+    const [contactEmail, setContactEmail] = useState(""); // State to hold client's contact information
 
     const user = auth.currentUser;
     const navigate = useNavigate();
@@ -118,6 +119,7 @@ export default function Home() { //main component the chat room
                     const clientData = clientDocSnapshot.data(); //if exisxt, extract the document data field
                     setClientName(clientData.name);
                     setContactInfo(clientData.contact);
+                    setContactEmail(clientData.email);
     
                     const createdTime = clientData.createdTime.toDate(); //convert firestore timestamp
                     const formattedCreatedTime = createdTime.toLocaleString();//make readable string date 
@@ -134,6 +136,7 @@ export default function Home() { //main component the chat room
                 //set to null if the user doesnt exist in client collections
                 setClientName("");
                 setContactInfo("");
+                setContactEmail("");
                 setAllMessages([]);
             }
         };
@@ -284,7 +287,8 @@ export default function Home() { //main component the chat room
                 
                 <div style={{ textAlign: "center", fontWeight: "bold"}}>
                     <h4>{clientName}</h4>
-                    <p>Contact information: {contactInfo}</p>
+                    <p>Contact Information: {contactInfo} </p>
+                    <p>Email Information: {contactEmail} </p>
                 </div>
              
                 <div style={messagesDiv}>
@@ -366,7 +370,7 @@ export default function Home() { //main component the chat room
                         </div>
                     ))}
                 </div>
-                <div style={{ width: "100%", display: "flex", flex: 0.08 }}>
+                {/* <div style={{ width: "100%", display: "flex", flex: 0.08 }}>
                     <input
                         value={chatMessage}
                         onChange={(e) => setChatMessage(e.target.value)}
@@ -377,7 +381,7 @@ export default function Home() { //main component the chat room
                     <IconButton onClick={sendMessage}>
                         <SendIcon style={{ margin: 10 }} />
                     </IconButton>
-                </div>
+                </div> */}
             </Paper>
         </div>
     );
